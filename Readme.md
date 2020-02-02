@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Dmitry Nogochev](https://up.htmlacademy.ru/javascript/19/user/207183).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Мастеров](https://up.htmlacademy.ru/javascript/19/user/912463).
 
 ---
 
