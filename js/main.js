@@ -108,26 +108,11 @@ addPictures(photos);
 
 // большая фотография
 
-// Покажите элемент .big-picture, удалив у него класс hidden и заполните его информацией из первого элемента массива с данными:
-
-// Адрес изображения url подставьте как src изображения внутри блока.big-picture__img.
-// Количество лайков likes подставьте как текстовое содержание элемента .likes-count.
-// Количество комментариев comments подставьте как текстовое содержание элемента .comments-count.
-// Список комментариев под фотографией: комментарии должны вставляться в блок .social__comments. Разметка каждого комментария должна выглядеть так:
-
-//     <li class="social__comment">
-//     <img
-//     class="social__picture"
-//     src="{{аватар}}"
-//     alt="{{имя комментатора}}"
-//     width="35" height="35">
-//     <p class="social__text">{{текст комментария}</p>
-//     </li>
-// Описание фотографии description вставьте строкой в блок .social__caption.
-
 var body = document.querySelector('body');
 var bigPicture = document.querySelector('.big-picture');
 var socialComments = bigPicture.querySelector('.social__comments');
+var socialСommentCount = bigPicture.querySelector('.social__comment-count');
+var commentsLoader = bigPicture.querySelector('.comments-loader');
 var testPicture = photos[0];
 
 bigPicture.querySelector('.big-picture__img img').src = testPicture.url;
@@ -155,3 +140,6 @@ for (var i = 0; i < testPicture.comments.length; i++) {
 socialComments.appendChild(commentFragment);
 
 bigPicture.classList.remove('hidden');
+socialСommentCount.classList.add('hidden');
+commentsLoader.classList.add('hidden');
+body.classList.add('modal-open');
