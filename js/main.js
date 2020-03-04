@@ -105,3 +105,53 @@ var addPictures = function (photos) {
 
 var photos = generatePhotos();
 addPictures(photos);
+
+// большая фотография
+
+// Покажите элемент .big-picture, удалив у него класс hidden и заполните его информацией из первого элемента массива с данными:
+
+// Адрес изображения url подставьте как src изображения внутри блока.big-picture__img.
+// Количество лайков likes подставьте как текстовое содержание элемента .likes-count.
+// Количество комментариев comments подставьте как текстовое содержание элемента .comments-count.
+// Список комментариев под фотографией: комментарии должны вставляться в блок .social__comments. Разметка каждого комментария должна выглядеть так:
+
+//     <li class="social__comment">
+//     <img
+//     class="social__picture"
+//     src="{{аватар}}"
+//     alt="{{имя комментатора}}"
+//     width="35" height="35">
+//     <p class="social__text">{{текст комментария}</p>
+//     </li>
+// Описание фотографии description вставьте строкой в блок .social__caption.
+
+var body = document.querySelector('body');
+var bigPicture = document.querySelector('.big-picture');
+var socialComments = bigPicture.querySelector('.social__comments');
+var testPicture = photos[0];
+
+bigPicture.querySelector('.big-picture__img img').src = testPicture.url;
+bigPicture.querySelector('.likes-count').textContent = testPicture.likes;
+bigPicture.querySelector('.comments-count').textContent = testPicture.comments.length;
+bigPicture.querySelector('.social__caption').textContent = testPicture.description;
+
+var commentList = bigPicture.querySelector('.social__comments');
+var commentFragment = document.createDocumentFragment();
+
+commentList.innerHTML = '';
+
+for (var i = 0; i < testPicture.comments.length; i++) {
+  var newComment = document.createElement('li');
+  newComment.className = 'social__comment';
+  newComment.innerHTML = '<img class="social__picture" src="'
+    + testPicture.comments[i].avatar
+    + '"alt="'
+    + testPicture.comments[i].autor
+    + '"width="35" height="35"> <p class="social__text">'
+    + testPicture.comments[i].message
+    + '</p>';
+  commentFragment.appendChild(newComment);
+}
+socialComments.appendChild(commentFragment);
+
+bigPicture.classList.remove('hidden');
