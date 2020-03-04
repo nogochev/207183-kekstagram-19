@@ -54,9 +54,9 @@ var generateComment = function () {
 
 var generateComments = function () {
   var comments = [];
-  var number11 = getRandomInteger(0, 10);
-  for (var j = 0; j < number11; j++) {
-    var comment = generateComment(j);
+  var numberOfComments = getRandomInteger(0, 10);
+  for (var i = 0; i < numberOfComments; i++) {
+    var comment = generateComment(i);
     comments.push(comment);
   }
 
