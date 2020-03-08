@@ -1,5 +1,6 @@
 'use strict';
 
+var ESC_KEY = 27;
 var MAX_PHOTOS = 25;
 var NAMES = [
   'Дмитрий',
@@ -131,6 +132,7 @@ var renderComment = function (comment) {
 
 var showBigPicture = function () {
   bigPicture.classList.remove('hidden');
+  body.classList.add('modal-open');
   return bigPicture;
 };
 
@@ -164,3 +166,88 @@ var fillPictureInfo = function (picture) {
 body.classList.add('modal-open');
 fillPictureInfo(testPicture);
 showBigPicture();
+
+// 4 модуль
+
+var imgUpload = document.querySelector('.img-upload__input');
+// var imgUploadForm = document.querySelector('.img-upload__form');
+var imgEdit = document.querySelector('.img-upload__overlay');
+var buttonCloseImgEdit = imgEdit.querySelector('.img-upload__cancel');
+
+var onImgUploadChange = function (evt) {
+  evt.preventDefault(); // удалить потом эту строку
+  document.body.classList.add('modal-open');
+  imgEdit.classList.remove('hidden');
+  setScale(currentScale);
+  document.addEventListener('keydown', onimgEditEscPress);
+};
+
+var onButtonCloseImgEditClick = function () {
+  document.body.classList.remove('modal-open');
+  imgEdit.classList.add('hidden');
+  setScale(ScaleValue.MAX);
+  setImgPreviewScale(currentScale);
+  document.removeEventListener('keydown', onimgEditEscPress);
+};
+
+var onimgEditEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEY) {
+    onButtonCloseImgEditClick();
+  }
+};
+
+// событие показа формы редактирования
+// потом заменить на change!!!
+imgUpload.addEventListener('click', onImgUploadChange);
+// закрытие редактора фото
+buttonCloseImgEdit.addEventListener('click', onButtonCloseImgEditClick);
+
+// изменение размера изображения
+
+var scaleInput = imgEdit.querySelector('.scale__control--value');
+var scaleUpButton = imgEdit.querySelector('.scale__control--bigger');
+var scaleDownButton = imgEdit.querySelector('.scale__control--smaller');
+var imgUploadPreview = imgEdit.querySelector('.img-upload__preview');
+
+var ScaleValue = {// перечисление
+  MIN: 25,
+  MAX: 100,
+  STEP: 25,
+};
+
+var setImgPreviewScale = function () {
+  var newScale = currentScale / 100;
+  imgUploadPreview.setAttribute('style', 'transform: scale(' + newScale + ');');
+};
+
+var currentScale = ScaleValue.MAX; // значение по умолчанию
+
+var setScale = function (value) {
+  currentScale = value;
+  scaleInput.value = value + '%';
+};
+
+var canScaleIncrease = function () {
+  return currentScale + ScaleValue.STEP <= ScaleValue.MAX;
+};
+
+var canScaleDecrease = function () {
+  return currentScale - ScaleValue.STEP >= ScaleValue.MIN;
+};
+
+var onScaleUpButtonClick = function () {
+  if (canScaleIncrease()) {
+    setScale(currentScale + ScaleValue.STEP);
+    setImgPreviewScale(currentScale);
+  }
+};
+
+var onScaleDownButtonClick = function () {
+  if (canScaleDecrease()) {
+    setScale(currentScale - ScaleValue.STEP);
+    setImgPreviewScale(currentScale);
+  }
+};
+
+scaleUpButton.addEventListener('click', onScaleUpButtonClick);
+scaleDownButton.addEventListener('click', onScaleDownButtonClick);
