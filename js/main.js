@@ -174,8 +174,7 @@ var imgUpload = document.querySelector('.img-upload__input');
 var imgEdit = document.querySelector('.img-upload__overlay');
 var buttonCloseImgEdit = imgEdit.querySelector('.img-upload__cancel');
 
-var onImgUploadChange = function (evt) {
-  evt.preventDefault(); // удалить потом эту строку
+var onImgUploadChange = function () {
   document.body.classList.add('modal-open');
   imgEdit.classList.remove('hidden');
   setScale(currentScale);
@@ -198,7 +197,7 @@ var onimgEditEscPress = function (evt) {
 
 // событие показа формы редактирования
 // потом заменить на change!!!
-imgUpload.addEventListener('click', onImgUploadChange);
+imgUpload.addEventListener('change', onImgUploadChange);
 // закрытие редактора фото
 buttonCloseImgEdit.addEventListener('click', onButtonCloseImgEditClick);
 
