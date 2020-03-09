@@ -1,6 +1,6 @@
 'use strict';
 
-var ESC_KEY = 27;
+var ESC_KEY = 'Escape';
 var MAX_PHOTOS = 25;
 var NAMES = [
   'Дмитрий',
@@ -163,52 +163,63 @@ var fillPictureInfo = function (picture) {
   hideCounts();
 };
 
-body.classList.add('modal-open');
+// body.classList.add('modal-open');
 fillPictureInfo(testPicture);
-showBigPicture();
+// showBigPicture();
 
 // 4 модуль
 
 var imgUpload = document.querySelector('.img-upload__input');
-// var imgUploadForm = document.querySelector('.img-upload__form');
+var imgUploadForm = document.querySelector('.img-upload__form');
 var imgEdit = document.querySelector('.img-upload__overlay');
-var buttonCloseImgEdit = imgEdit.querySelector('.img-upload__cancel');
+var imgEditCancelButton = imgEdit.querySelector('#upload-cancel');
+
+var isEscapeKey = function (evt) {
+  return evt.key === ESC_KEY;
+};
 
 var onImgUploadChange = function () {
-  document.body.classList.add('modal-open');
   imgEdit.classList.remove('hidden');
+  document.body.classList.add('modal-open');
   setScale(currentScale);
-  document.addEventListener('keydown', onimgEditEscPress);
+  document.addEventListener('keydown', onImgEditEscPress);
 };
 
 var onButtonCloseImgEditClick = function () {
-  document.body.classList.remove('modal-open');
   imgEdit.classList.add('hidden');
+  document.body.classList.remove('modal-open');
   setScale(ScaleValue.MAX);
-  setImgPreviewScale(currentScale);
-  document.removeEventListener('keydown', onimgEditEscPress);
+  imgUploadForm.reset();
+  resetImageEffect();
+  document.removeEventListener('keydown', onImgEditEscPress);
 };
 
-var onimgEditEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEY) {
-    onButtonCloseImgEditClick();
+var closePopup = function () {
+  onButtonCloseImgEditClick();
+};
+
+var openPopup = function () {
+  onImgUploadChange();
+};
+
+var onImgEditEscPress = function (evt) {
+  if (isEscapeKey(evt)) {
+    closePopup();
   }
 };
 
-// событие показа формы редактирования
-// потом заменить на change!!!
-imgUpload.addEventListener('change', onImgUploadChange);
-// закрытие редактора фото
-buttonCloseImgEdit.addEventListener('click', onButtonCloseImgEditClick);
+imgEditCancelButton.addEventListener('click', closePopup);
+imgUpload.addEventListener('change', openPopup);
 
-// изменение размера изображения
+
+// изменение размера превью изображения
 
 var scaleInput = imgEdit.querySelector('.scale__control--value');
 var scaleUpButton = imgEdit.querySelector('.scale__control--bigger');
 var scaleDownButton = imgEdit.querySelector('.scale__control--smaller');
 var imgUploadPreview = imgEdit.querySelector('.img-upload__preview');
 
-var ScaleValue = {// перечисление
+var ScaleValue = {
   MIN: 25,
   MAX: 100,
   STEP: 25,
@@ -216,7 +227,7 @@ var ScaleValue = {// перечисление
 
 var setImgPreviewScale = function () {
   var newScale = currentScale / 100;
-  imgUploadPreview.setAttribute('style', 'transform: scale(' + newScale + ');');
+  imgUploadPreview.style.transform = 'scale(' + newScale + ')';
 };
 
 var currentScale = ScaleValue.MAX; // значение по умолчанию
@@ -224,6 +235,7 @@ var currentScale = ScaleValue.MAX; // значение по умолчанию
 var setScale = function (value) {
   currentScale = value;
   scaleInput.value = value + '%';
+  setImgPreviewScale();
 };
 
 var canScaleIncrease = function () {
@@ -237,16 +249,51 @@ var canScaleDecrease = function () {
 var onScaleUpButtonClick = function () {
   if (canScaleIncrease()) {
     setScale(currentScale + ScaleValue.STEP);
-    setImgPreviewScale(currentScale);
   }
 };
 
 var onScaleDownButtonClick = function () {
   if (canScaleDecrease()) {
     setScale(currentScale - ScaleValue.STEP);
-    setImgPreviewScale(currentScale);
   }
 };
 
 scaleUpButton.addEventListener('click', onScaleUpButtonClick);
 scaleDownButton.addEventListener('click', onScaleDownButtonClick);
+
+// Применение эффекта для изображения
+
+var previewImage = imgEdit.querySelector('.img-upload__preview img');
+var effectFields = imgEdit.querySelector('.img-upload__effects');
+
+var EFFECT_ORIGINAL = 'none';
+
+var EffectClass = {
+  NONE: '',
+  NAME: 'effects__preview--',
+};
+
+var currentEffect = EFFECT_ORIGINAL;
+
+var getEffectClass = function () {
+  return currentEffect === EFFECT_ORIGINAL
+    ? EffectClass.NONE
+    : EffectClass.NAME + currentEffect;
+};
+
+var applyEffect = function (effect) {
+  currentEffect = effect;
+
+  previewImage.style.filter = '';
+  previewImage.className = getEffectClass();
+};
+
+var onEffectChange = function (evt) {
+  applyEffect(evt.target.value);
+};
+
+var resetImageEffect = function () {
+  applyEffect(EffectClass.NONE);
+};
+
+effectFields.addEventListener('change', onEffectChange);
