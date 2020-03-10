@@ -163,9 +163,9 @@ var fillPictureInfo = function (picture) {
   hideCounts();
 };
 
-// body.classList.add('modal-open');
+body.classList.add('modal-open');
 fillPictureInfo(testPicture);
-// showBigPicture();
+showBigPicture();
 
 // 4 модуль
 
@@ -179,13 +179,14 @@ var isEscapeKey = function (evt) {
 };
 
 var onImgUploadChange = function () {
-  imgEdit.classList.remove('hidden');
-  document.body.classList.add('modal-open');
-  setScale(currentScale);
-  document.addEventListener('keydown', onImgEditEscPress);
+  openPopup();
 };
 
-var onButtonCloseImgEditClick = function () {
+var onImgEditCancelButtonClick = function () {
+  closePopup();
+};
+
+var closePopup = function () {
   imgEdit.classList.add('hidden');
   document.body.classList.remove('modal-open');
   setScale(ScaleValue.MAX);
@@ -194,12 +195,11 @@ var onButtonCloseImgEditClick = function () {
   document.removeEventListener('keydown', onImgEditEscPress);
 };
 
-var closePopup = function () {
-  onButtonCloseImgEditClick();
-};
-
 var openPopup = function () {
-  onImgUploadChange();
+  imgEdit.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+  setScale(currentScale);
+  document.addEventListener('keydown', onImgEditEscPress);
 };
 
 var onImgEditEscPress = function (evt) {
@@ -208,12 +208,10 @@ var onImgEditEscPress = function (evt) {
   }
 };
 
-imgEditCancelButton.addEventListener('click', closePopup);
-imgUpload.addEventListener('change', openPopup);
-
+imgEditCancelButton.addEventListener('click', onImgEditCancelButtonClick);
+imgUpload.addEventListener('change', onImgUploadChange);
 
 // изменение размера превью изображения
-
 var scaleInput = imgEdit.querySelector('.scale__control--value');
 var scaleUpButton = imgEdit.querySelector('.scale__control--bigger');
 var scaleDownButton = imgEdit.querySelector('.scale__control--smaller');
@@ -261,8 +259,6 @@ var onScaleDownButtonClick = function () {
 scaleUpButton.addEventListener('click', onScaleUpButtonClick);
 scaleDownButton.addEventListener('click', onScaleDownButtonClick);
 
-// Применение эффекта для изображения
-
 var previewImage = imgEdit.querySelector('.img-upload__preview img');
 var effectFields = imgEdit.querySelector('.img-upload__effects');
 
@@ -297,3 +293,60 @@ var resetImageEffect = function () {
 };
 
 effectFields.addEventListener('change', onEffectChange);
+
+var hashtagInput = document.querySelector('.text__hashtags');
+
+var TagLength = {
+  MIN: 1,
+  MAX: 20,
+};
+
+var ValidateMessage = {
+  NO_ERRORS: '',
+  TOO_SHORT: 'Имя должно состоять минимум из ' + TagLength.MIN + '-х символов',
+  TOO_LONG: 'Имя должно состоять минимум из ' + TagLength.MAX + '-х символов',
+};
+
+var TAGS_MAX = 5;
+
+var INVALID_TAG_REGEXP = /\#[^0-9a-zA-Zа-яА-ЯёЁ]+/;
+
+var validateHashtags = function (hashtags) {
+  if (hashtags.length > TAGS_MAX) {
+    return 'тегов больше 5-и';
+  }
+
+  for (var i = 0; i < hashtags.length; i++) {
+    var tag = hashtags[i];
+
+    if (tag.length < TagLength.MIN) {
+      return ValidateMessage.TOO_SHORT;
+    }
+    if (tag.length >= TagLength.MAX) {
+      return ValidateMessage.TOO_LONG;
+    }
+
+    if (tag.lastIndexOf('#') > 0) {
+      return 'Хэш-тег должен начинаться с символа #';
+    }
+
+    if (hashtags.indexOf(tag, i + 1) > -1) {
+      return 'Один и тот же хэш-тег не может быть использован дважды';
+    }
+
+    if (INVALID_TAG_REGEXP.test(tag)) {
+      return 'не может содержать пробелы, спецсимволы (#, @, $ и т.п.), символы пунктуации (тире, дефис, запятая и т.п.), эмодзи и т.д';
+    }
+  }
+
+  return ValidateMessage.NO_ERRORS;
+};
+
+var onHashtagInput = function (evt) {
+  var hashtags = evt.target.value.toLowerCase().split(' ');
+  var message = validateHashtags(hashtags);
+
+  hashtagInput.setCustomValidity(message);
+};
+
+hashtagInput.addEventListener('input', onHashtagInput);
