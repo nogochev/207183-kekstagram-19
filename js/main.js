@@ -1,6 +1,7 @@
 'use strict';
 
 var ESC_KEY = 'Escape';
+var ENTER_KEY = 'Enter';
 var MAX_PHOTOS = 25;
 var NAMES = [
   'Дмитрий',
@@ -92,6 +93,18 @@ var renderPicture = function (photo) {
   picture.querySelector('.picture__comments').textContent = photo.comments.length;
   picture.querySelector('.picture__likes').textContent = photo.likes;
 
+  picture.addEventListener('click', function (evt) {
+    if (evt.target.classList.contains('picture__img')) {
+      showBigPicture(photo);
+    }
+  });
+
+  picture.addEventListener('keydown', function (evt) {
+    if (isEnterKey(evt) && evt.target.classList.contains('picture')) {
+      showBigPicture(photo);
+    }
+  });
+
   return picture;
 };
 
@@ -116,8 +129,10 @@ var bigPicture = document.querySelector('.big-picture');
 var socialComments = bigPicture.querySelector('.social__comments');
 var socialСommentCount = bigPicture.querySelector('.social__comment-count');
 var commentsLoader = bigPicture.querySelector('.comments-loader');
-var testPicture = photos[0];
 var commentTemplate = socialComments.querySelector('.social__comment');
+var closePictureButton = bigPicture.querySelector('#picture-cancel');
+var picturesContainer = document.querySelector('.pictures');
+// var picturesCollection = picturesContainer.querySelectorAll('.picture__img');
 
 var renderComment = function (comment) {
   var item = commentTemplate.cloneNode(true);
@@ -130,11 +145,62 @@ var renderComment = function (comment) {
   return item;
 };
 
-var showBigPicture = function () {
+// Показ большого фото и заполнение
+
+var showBigPicture = function (pictureCurrent) {
+  fillPictureInfo(pictureCurrent);
   bigPicture.classList.remove('hidden');
   body.classList.add('modal-open');
-  return bigPicture;
 };
+
+var closeBigPicture = function () {
+  bigPicture.classList.add('hidden');
+  body.classList.remove('modal-open');
+};
+
+var addEventKeyBigPicture = function () {
+  document.addEventListener('keydown', onButtonPictureCloseEnterDown);
+  document.addEventListener('keydown', onButtonPictureCloseEscapeDown);
+};
+
+var removeEventKeyBigPicture = function () {
+  document.removeEventListener('keydown', onButtonPictureCloseEnterDown);
+  document.removeEventListener('keydown', onButtonPictureCloseEscapeDown);
+};
+
+var onButtonPictureCloseEnterDown = function (evt) {
+  if (isEnterKey(evt) && evt.target === closePictureButton) {
+    closeBigPicture();
+    addEventKeyBigPicture();
+    removeEventKeyBigPicture();
+  }
+};
+
+var onButtonPictureOpenEnterDown = function (evt) {
+  if (isEnterKey(evt) && evt.target.classList.contains('picture')) {
+    addEventKeyBigPicture();
+  }
+};
+
+picturesContainer.addEventListener('click', function (evt) {
+  if (evt.target.classList.contains('picture__img')) {
+    addEventKeyBigPicture();
+  }
+});
+
+picturesContainer.addEventListener('keydown', onButtonPictureOpenEnterDown);
+
+var onButtonPictureCloseEscapeDown = function (evt) {
+  if (isEscapeKey(evt)) {
+    closeBigPicture();
+    removeEventKeyBigPicture();
+  }
+};
+
+closePictureButton.addEventListener('click', function () {
+  closeBigPicture();
+  removeEventKeyBigPicture();
+});
 
 var addComments = function (arr) {
   socialComments.innerHTML = '';
@@ -163,19 +229,21 @@ var fillPictureInfo = function (picture) {
   hideCounts();
 };
 
-body.classList.add('modal-open');
-fillPictureInfo(testPicture);
-showBigPicture();
-
 // 4 модуль
 
 var imgUpload = document.querySelector('.img-upload__input');
 var imgUploadForm = document.querySelector('.img-upload__form');
 var imgEdit = document.querySelector('.img-upload__overlay');
 var imgEditCancelButton = imgEdit.querySelector('#upload-cancel');
+var imgHashtag = imgEdit.querySelector('.text__hashtags');
+var imgCommentPreview = imgEdit.querySelector('.text__description');
 
 var isEscapeKey = function (evt) {
   return evt.key === ESC_KEY;
+};
+
+var isEnterKey = function (evt) {
+  return evt.key === ENTER_KEY;
 };
 
 var onImgUploadChange = function () {
@@ -188,22 +256,24 @@ var onImgEditCancelButtonClick = function () {
 
 var closePopup = function () {
   imgEdit.classList.add('hidden');
-  document.body.classList.remove('modal-open');
+  body.classList.remove('modal-open');
   setScale(ScaleValue.MAX);
   imgUploadForm.reset();
   resetImageEffect();
+
   document.removeEventListener('keydown', onImgEditEscPress);
 };
 
 var openPopup = function () {
   imgEdit.classList.remove('hidden');
-  document.body.classList.add('modal-open');
+  body.classList.add('modal-open');
   setScale(currentScale);
   document.addEventListener('keydown', onImgEditEscPress);
 };
 
 var onImgEditEscPress = function (evt) {
-  if (isEscapeKey(evt)) {
+  if (isEscapeKey(evt) && imgHashtag !== document.activeElement && imgCommentPreview !== document.activeElement) {
+    imgUploadForm.reset();
     closePopup();
   }
 };
@@ -291,6 +361,13 @@ var onEffectChange = function (evt) {
 var resetImageEffect = function () {
   applyEffect(EffectClass.NONE);
 };
+
+// var effectLevel = imgEdit.querySelector('.effect-level');
+
+// var hideEffectLevel = function () {
+//   effectLevel.classList.add('hidden');
+// };
+
 
 effectFields.addEventListener('change', onEffectChange);
 
