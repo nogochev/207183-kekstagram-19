@@ -1,6 +1,11 @@
 'use strict';
 
-var ESC_KEY = 'Escape';
+
+var KeyboardKey = {
+  ESC: 'Escape',
+  ENTER: 'Enter',
+};
+
 var MAX_PHOTOS = 25;
 var NAMES = [
   'Дмитрий',
@@ -64,8 +69,6 @@ var generateComments = function () {
   return comments;
 };
 
-// var generatedComments = generateComments();
-
 var generatePhoto = function (id) {
   return {
     url: 'photos/' + id + '.jpg',
@@ -92,6 +95,10 @@ var renderPicture = function (photo) {
   picture.querySelector('.picture__comments').textContent = photo.comments.length;
   picture.querySelector('.picture__likes').textContent = photo.likes;
 
+  picture.addEventListener('click', function () {
+    showBigPicture(photo);
+  });
+
   return picture;
 };
 
@@ -116,8 +123,8 @@ var bigPicture = document.querySelector('.big-picture');
 var socialComments = bigPicture.querySelector('.social__comments');
 var socialСommentCount = bigPicture.querySelector('.social__comment-count');
 var commentsLoader = bigPicture.querySelector('.comments-loader');
-var testPicture = photos[0];
 var commentTemplate = socialComments.querySelector('.social__comment');
+var closePictureButton = bigPicture.querySelector('#picture-cancel');
 
 var renderComment = function (comment) {
   var item = commentTemplate.cloneNode(true);
@@ -130,11 +137,41 @@ var renderComment = function (comment) {
   return item;
 };
 
-var showBigPicture = function () {
+// Показ большого фото и заполнение
+
+var onClosePictureButtonEnterDown = function (evt) {
+  if (isEnterKey(evt)) {
+    closeBigPicture();
+  }
+};
+
+var onBigPictureEscDown = function (evt) {
+  if (isEscapeKey(evt)) {
+    closeBigPicture();
+  }
+};
+
+var onBigPictureButtonClose = function () {
+  closeBigPicture();
+};
+
+var showBigPicture = function (picture) {
+  fillPictureInfo(picture);
   bigPicture.classList.remove('hidden');
   body.classList.add('modal-open');
-  return bigPicture;
+  closePictureButton.addEventListener('keydown', onClosePictureButtonEnterDown);
+  document.addEventListener('keydown', onBigPictureEscDown);
+  closePictureButton.addEventListener('click', onBigPictureButtonClose);
 };
+
+var closeBigPicture = function () {
+  bigPicture.classList.add('hidden');
+  body.classList.remove('modal-open');
+  closePictureButton.removeEventListener('keydown', onClosePictureButtonEnterDown);
+  document.removeEventListener('keydown', onBigPictureEscDown);
+  closePictureButton.removeEventListener('click', onBigPictureButtonClose);
+};
+
 
 var addComments = function (arr) {
   socialComments.innerHTML = '';
@@ -159,13 +196,9 @@ var fillPictureInfo = function (picture) {
   bigPicture.querySelector('.comments-count').textContent = picture.comments.length;
   bigPicture.querySelector('.social__caption').textContent = picture.description;
 
-  addComments(generateComments());
+  addComments(picture.comments);
   hideCounts();
 };
-
-body.classList.add('modal-open');
-fillPictureInfo(testPicture);
-showBigPicture();
 
 // 4 модуль
 
@@ -173,42 +206,51 @@ var imgUpload = document.querySelector('.img-upload__input');
 var imgUploadForm = document.querySelector('.img-upload__form');
 var imgEdit = document.querySelector('.img-upload__overlay');
 var imgEditCancelButton = imgEdit.querySelector('#upload-cancel');
+var imgHashtag = imgEdit.querySelector('.text__hashtags');
+var imgCommentPreview = imgEdit.querySelector('.text__description');
 
 var isEscapeKey = function (evt) {
-  return evt.key === ESC_KEY;
+  return evt.key === KeyboardKey.ESC;
+};
+
+var isEnterKey = function (evt) {
+  return evt.key === KeyboardKey.ENTER;
 };
 
 var onImgUploadChange = function () {
-  openPopup();
+  openUploadPreview();
 };
 
-var onImgEditCancelButtonClick = function () {
-  closePopup();
+var onPreviewButtonCloseClick = function () {
+  closeUploadPreview();
 };
 
-var closePopup = function () {
+var openUploadPreview = function () {
+  imgEdit.classList.remove('hidden');
+  body.classList.add('modal-open');
+  document.addEventListener('keydown', onImgEditEscPress);
+};
+
+var closeUploadPreview = function () {
   imgEdit.classList.add('hidden');
-  document.body.classList.remove('modal-open');
+  body.classList.remove('modal-open');
   setScale(ScaleValue.MAX);
   imgUploadForm.reset();
   resetImageEffect();
   document.removeEventListener('keydown', onImgEditEscPress);
 };
 
-var openPopup = function () {
-  imgEdit.classList.remove('hidden');
-  document.body.classList.add('modal-open');
-  setScale(currentScale);
-  document.addEventListener('keydown', onImgEditEscPress);
-};
-
 var onImgEditEscPress = function (evt) {
-  if (isEscapeKey(evt)) {
-    closePopup();
+  if (
+    isEscapeKey(evt)
+    && imgHashtag !== document.activeElement
+    && imgCommentPreview !== document.activeElement
+  ) {
+    closeUploadPreview();
   }
 };
 
-imgEditCancelButton.addEventListener('click', onImgEditCancelButtonClick);
+imgEditCancelButton.addEventListener('click', onPreviewButtonCloseClick);
 imgUpload.addEventListener('change', onImgUploadChange);
 
 // изменение размера превью изображения
@@ -284,7 +326,7 @@ var applyEffect = function (effect) {
   previewImage.className = getEffectClass();
 };
 
-var onEffectChange = function (evt) {
+var onEffectFieldsChange = function (evt) {
   applyEffect(evt.target.value);
 };
 
@@ -292,7 +334,7 @@ var resetImageEffect = function () {
   applyEffect(EffectClass.NONE);
 };
 
-effectFields.addEventListener('change', onEffectChange);
+effectFields.addEventListener('change', onEffectFieldsChange);
 
 var hashtagInput = document.querySelector('.text__hashtags');
 
@@ -304,7 +346,11 @@ var TagLength = {
 var ValidateMessage = {
   NO_ERRORS: '',
   TOO_SHORT: 'Имя должно состоять минимум из ' + TagLength.MIN + '-х символов',
-  TOO_LONG: 'Имя должно состоять минимум из ' + TagLength.MAX + '-х символов',
+  TOO_LONG: 'Имя должно состоять максимум из ' + TagLength.MAX + '-х символов',
+  MORE_FIVE: 'нельзя указать больше пяти хэш-тегов',
+  HASH_SYMBOL: 'хэш-тег начинается с символа # (решётка)',
+  HASHTAG_TWICE: 'один и тот же хэш-тег не может быть использован дважды',
+  NO_SPECIAL_SYMBOLS: 'строка после решётки должна состоять из букв и чисел и не может содержать пробелы, спецсимволы (#, @, $ и т.п.), символы пунктуации (тире, дефис, запятая и т.п.), эмодзи и т.д.;',
 };
 
 var TAGS_MAX = 5;
@@ -313,7 +359,7 @@ var INVALID_TAG_REGEXP = /\#[^0-9a-zA-Zа-яА-ЯёЁ]+/;
 
 var validateHashtags = function (hashtags) {
   if (hashtags.length > TAGS_MAX) {
-    return 'тегов больше 5-и';
+    return ValidateMessage.MORE_FIVE;
   }
 
   for (var i = 0; i < hashtags.length; i++) {
@@ -327,15 +373,15 @@ var validateHashtags = function (hashtags) {
     }
 
     if (tag.lastIndexOf('#') > 0) {
-      return 'Хэш-тег должен начинаться с символа #';
+      return ValidateMessage.HASH_SYMBOL;
     }
 
     if (hashtags.indexOf(tag, i + 1) > -1) {
-      return 'Один и тот же хэш-тег не может быть использован дважды';
+      return ValidateMessage.HASHTAG_TWICE;
     }
 
     if (INVALID_TAG_REGEXP.test(tag)) {
-      return 'не может содержать пробелы, спецсимволы (#, @, $ и т.п.), символы пунктуации (тире, дефис, запятая и т.п.), эмодзи и т.д';
+      return ValidateMessage.NO_SPECIAL_SYMBOLS;
     }
   }
 
