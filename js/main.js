@@ -1,7 +1,12 @@
 'use strict';
 
-var ESC_KEY = 'Escape';
-var ENTER_KEY = 'Enter';
+
+var KeyboardKey = {
+  ESC_KEY: 'Escape',
+  ENTER_KEY: 'Enter',
+};
+// var ESC_KEY = 'Escape';
+// var ENTER_KEY = 'Enter';
 var MAX_PHOTOS = 25;
 var NAMES = [
   'Дмитрий',
@@ -93,16 +98,8 @@ var renderPicture = function (photo) {
   picture.querySelector('.picture__comments').textContent = photo.comments.length;
   picture.querySelector('.picture__likes').textContent = photo.likes;
 
-  picture.addEventListener('click', function (evt) {
-    if (evt.target.classList.contains('picture__img')) {
-      showBigPicture(photo);
-    }
-  });
-
-  picture.addEventListener('keydown', function (evt) {
-    if (isEnterKey(evt) && evt.target.classList.contains('picture')) {
-      showBigPicture(photo);
-    }
+  picture.addEventListener('click', function () {
+    showBigPicture(photo);
   });
 
   return picture;
@@ -182,12 +179,6 @@ var onButtonPictureOpenEnterDown = function (evt) {
   }
 };
 
-picturesContainer.addEventListener('click', function (evt) {
-  if (evt.target.classList.contains('picture__img')) {
-    addEventKeyBigPicture();
-  }
-});
-
 picturesContainer.addEventListener('keydown', onButtonPictureOpenEnterDown);
 
 var onButtonPictureCloseEscapeDown = function (evt) {
@@ -225,7 +216,7 @@ var fillPictureInfo = function (picture) {
   bigPicture.querySelector('.comments-count').textContent = picture.comments.length;
   bigPicture.querySelector('.social__caption').textContent = picture.description;
 
-  addComments(generateComments());
+  addComments(picture.comments);
   hideCounts();
 };
 
@@ -239,11 +230,11 @@ var imgHashtag = imgEdit.querySelector('.text__hashtags');
 var imgCommentPreview = imgEdit.querySelector('.text__description');
 
 var isEscapeKey = function (evt) {
-  return evt.key === ESC_KEY;
+  return evt.key === KeyboardKey.ESC_KEY;
 };
 
 var isEnterKey = function (evt) {
-  return evt.key === ENTER_KEY;
+  return evt.key === KeyboardKey.ENTER_KEY;
 };
 
 var onImgUploadChange = function () {
@@ -272,8 +263,11 @@ var openPopup = function () {
 };
 
 var onImgEditEscPress = function (evt) {
-  if (isEscapeKey(evt) && imgHashtag !== document.activeElement && imgCommentPreview !== document.activeElement) {
-    imgUploadForm.reset();
+  if (
+    isEscapeKey(evt)
+    && imgHashtag !== document.activeElement
+    && imgCommentPreview !== document.activeElement
+  ) {
     closePopup();
   }
 };
@@ -354,7 +348,7 @@ var applyEffect = function (effect) {
   previewImage.className = getEffectClass();
 };
 
-var onEffectChange = function (evt) {
+var onEffectFieldsChange = function (evt) {
   applyEffect(evt.target.value);
 };
 
@@ -369,7 +363,7 @@ var resetImageEffect = function () {
 // };
 
 
-effectFields.addEventListener('change', onEffectChange);
+effectFields.addEventListener('change', onEffectFieldsChange);
 
 var hashtagInput = document.querySelector('.text__hashtags');
 
