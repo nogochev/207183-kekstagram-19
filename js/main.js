@@ -2,11 +2,10 @@
 
 
 var KeyboardKey = {
-  ESC_KEY: 'Escape',
-  ENTER_KEY: 'Enter',
+  ESC: 'Escape',
+  ENTER: 'Enter',
 };
-// var ESC_KEY = 'Escape';
-// var ENTER_KEY = 'Enter';
+
 var MAX_PHOTOS = 25;
 var NAMES = [
   'Дмитрий',
@@ -70,8 +69,6 @@ var generateComments = function () {
   return comments;
 };
 
-// var generatedComments = generateComments();
-
 var generatePhoto = function (id) {
   return {
     url: 'photos/' + id + '.jpg',
@@ -128,8 +125,6 @@ var socialСommentCount = bigPicture.querySelector('.social__comment-count');
 var commentsLoader = bigPicture.querySelector('.comments-loader');
 var commentTemplate = socialComments.querySelector('.social__comment');
 var closePictureButton = bigPicture.querySelector('#picture-cancel');
-var picturesContainer = document.querySelector('.pictures');
-// var picturesCollection = picturesContainer.querySelectorAll('.picture__img');
 
 var renderComment = function (comment) {
   var item = commentTemplate.cloneNode(true);
@@ -144,54 +139,39 @@ var renderComment = function (comment) {
 
 // Показ большого фото и заполнение
 
-var showBigPicture = function (pictureCurrent) {
-  fillPictureInfo(pictureCurrent);
+var onClosePictureButtonEnterDown = function (evt) {
+  if (isEnterKey(evt)) {
+    closeBigPicture();
+  }
+};
+
+var onBigPictureEscDown = function (evt) {
+  if (isEscapeKey(evt)) {
+    closeBigPicture();
+  }
+};
+
+var onBigPictureButtonClose = function () {
+  closeBigPicture();
+};
+
+var showBigPicture = function (picture) {
+  fillPictureInfo(picture);
   bigPicture.classList.remove('hidden');
   body.classList.add('modal-open');
+  closePictureButton.addEventListener('keydown', onClosePictureButtonEnterDown);
+  document.addEventListener('keydown', onBigPictureEscDown);
+  closePictureButton.addEventListener('click', onBigPictureButtonClose);
 };
 
 var closeBigPicture = function () {
   bigPicture.classList.add('hidden');
   body.classList.remove('modal-open');
+  closePictureButton.removeEventListener('keydown', onClosePictureButtonEnterDown);
+  document.removeEventListener('keydown', onBigPictureEscDown);
+  closePictureButton.removeEventListener('click', onBigPictureButtonClose);
 };
 
-var addEventKeyBigPicture = function () {
-  document.addEventListener('keydown', onButtonPictureCloseEnterDown);
-  document.addEventListener('keydown', onButtonPictureCloseEscapeDown);
-};
-
-var removeEventKeyBigPicture = function () {
-  document.removeEventListener('keydown', onButtonPictureCloseEnterDown);
-  document.removeEventListener('keydown', onButtonPictureCloseEscapeDown);
-};
-
-var onButtonPictureCloseEnterDown = function (evt) {
-  if (isEnterKey(evt) && evt.target === closePictureButton) {
-    closeBigPicture();
-    addEventKeyBigPicture();
-    removeEventKeyBigPicture();
-  }
-};
-
-var onButtonPictureOpenEnterDown = function (evt) {
-  if (isEnterKey(evt) && evt.target.classList.contains('picture')) {
-    addEventKeyBigPicture();
-  }
-};
-
-picturesContainer.addEventListener('keydown', onButtonPictureOpenEnterDown);
-
-var onButtonPictureCloseEscapeDown = function (evt) {
-  if (isEscapeKey(evt)) {
-    closeBigPicture();
-    removeEventKeyBigPicture();
-  }
-};
-
-closePictureButton.addEventListener('click', function () {
-  closeBigPicture();
-  removeEventKeyBigPicture();
-});
 
 var addComments = function (arr) {
   socialComments.innerHTML = '';
@@ -230,36 +210,34 @@ var imgHashtag = imgEdit.querySelector('.text__hashtags');
 var imgCommentPreview = imgEdit.querySelector('.text__description');
 
 var isEscapeKey = function (evt) {
-  return evt.key === KeyboardKey.ESC_KEY;
+  return evt.key === KeyboardKey.ESC;
 };
 
 var isEnterKey = function (evt) {
-  return evt.key === KeyboardKey.ENTER_KEY;
+  return evt.key === KeyboardKey.ENTER;
 };
 
 var onImgUploadChange = function () {
-  openPopup();
+  openUploadPreview();
 };
 
-var onImgEditCancelButtonClick = function () {
-  closePopup();
+var onPreviewButtonCloseClick = function () {
+  closeUploadPreview();
 };
 
-var closePopup = function () {
+var openUploadPreview = function () {
+  imgEdit.classList.remove('hidden');
+  body.classList.add('modal-open');
+  document.addEventListener('keydown', onImgEditEscPress);
+};
+
+var closeUploadPreview = function () {
   imgEdit.classList.add('hidden');
   body.classList.remove('modal-open');
   setScale(ScaleValue.MAX);
   imgUploadForm.reset();
   resetImageEffect();
-
   document.removeEventListener('keydown', onImgEditEscPress);
-};
-
-var openPopup = function () {
-  imgEdit.classList.remove('hidden');
-  body.classList.add('modal-open');
-  setScale(currentScale);
-  document.addEventListener('keydown', onImgEditEscPress);
 };
 
 var onImgEditEscPress = function (evt) {
@@ -268,11 +246,11 @@ var onImgEditEscPress = function (evt) {
     && imgHashtag !== document.activeElement
     && imgCommentPreview !== document.activeElement
   ) {
-    closePopup();
+    closeUploadPreview();
   }
 };
 
-imgEditCancelButton.addEventListener('click', onImgEditCancelButtonClick);
+imgEditCancelButton.addEventListener('click', onPreviewButtonCloseClick);
 imgUpload.addEventListener('change', onImgUploadChange);
 
 // изменение размера превью изображения
@@ -356,13 +334,6 @@ var resetImageEffect = function () {
   applyEffect(EffectClass.NONE);
 };
 
-// var effectLevel = imgEdit.querySelector('.effect-level');
-
-// var hideEffectLevel = function () {
-//   effectLevel.classList.add('hidden');
-// };
-
-
 effectFields.addEventListener('change', onEffectFieldsChange);
 
 var hashtagInput = document.querySelector('.text__hashtags');
@@ -375,7 +346,11 @@ var TagLength = {
 var ValidateMessage = {
   NO_ERRORS: '',
   TOO_SHORT: 'Имя должно состоять минимум из ' + TagLength.MIN + '-х символов',
-  TOO_LONG: 'Имя должно состоять минимум из ' + TagLength.MAX + '-х символов',
+  TOO_LONG: 'Имя должно состоять максимум из ' + TagLength.MAX + '-х символов',
+  MORE_FIVE: 'нельзя указать больше пяти хэш-тегов',
+  HASH_SYMBOL: 'хэш-тег начинается с символа # (решётка)',
+  HASHTAG_TWICE: 'один и тот же хэш-тег не может быть использован дважды',
+  NO_SPECIAL_SYMBOLS: 'строка после решётки должна состоять из букв и чисел и не может содержать пробелы, спецсимволы (#, @, $ и т.п.), символы пунктуации (тире, дефис, запятая и т.п.), эмодзи и т.д.;',
 };
 
 var TAGS_MAX = 5;
@@ -384,7 +359,7 @@ var INVALID_TAG_REGEXP = /\#[^0-9a-zA-Zа-яА-ЯёЁ]+/;
 
 var validateHashtags = function (hashtags) {
   if (hashtags.length > TAGS_MAX) {
-    return 'тегов больше 5-и';
+    return ValidateMessage.MORE_FIVE;
   }
 
   for (var i = 0; i < hashtags.length; i++) {
@@ -398,15 +373,15 @@ var validateHashtags = function (hashtags) {
     }
 
     if (tag.lastIndexOf('#') > 0) {
-      return 'Хэш-тег должен начинаться с символа #';
+      return ValidateMessage.HASH_SYMBOL;
     }
 
     if (hashtags.indexOf(tag, i + 1) > -1) {
-      return 'Один и тот же хэш-тег не может быть использован дважды';
+      return ValidateMessage.HASHTAG_TWICE;
     }
 
     if (INVALID_TAG_REGEXP.test(tag)) {
-      return 'не может содержать пробелы, спецсимволы (#, @, $ и т.п.), символы пунктуации (тире, дефис, запятая и т.п.), эмодзи и т.д';
+      return ValidateMessage.NO_SPECIAL_SYMBOLS;
     }
   }
 
