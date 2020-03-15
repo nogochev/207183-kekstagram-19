@@ -1,17 +1,18 @@
 'use strict';
 
 (function () {
-  var imgEdit = document.querySelector('.img-upload__overlay');
-  var previewImage = imgEdit.querySelector('.img-upload__preview img');
-  var effectFields = imgEdit.querySelector('.img-upload__effects');
-  var effectLevel = imgEdit.querySelector('.effect-level');
-
   var EFFECT_ORIGINAL = 'none';
 
   var EffectClass = {
     NONE: '',
     NAME: 'effects__preview--',
   };
+
+  var imgEdit = document.querySelector('.img-upload__overlay');
+  var previewImage = imgEdit.querySelector('.img-upload__preview img');
+  var effectFields = imgEdit.querySelector('.img-upload__effects');
+  var effectLevel = imgEdit.querySelector('.effect-level');
+
 
   var currentEffect = EFFECT_ORIGINAL;
 
@@ -53,7 +54,7 @@
   effectFields.addEventListener('change', onEffectFieldsChange);
 
   window.effectBar = {
-    resetImageEffect: resetImageEffect,
-    applyEffect: applyEffect,
+    resetFilter: resetImageEffect,
+    applyFilter: applyEffect(EFFECT_ORIGINAL),
   };
 })();

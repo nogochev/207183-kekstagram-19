@@ -6,10 +6,9 @@
   var addPictures = function (photos) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < photos.length; i++) {
-      var picture = window.renderPicture(photos[i]);
-      fragment.appendChild(picture);
-    }
+    photos.forEach(function (photo) {
+      fragment.appendChild(window.renderPicture(photo));
+    });
 
     userPictures.appendChild(fragment);
   };

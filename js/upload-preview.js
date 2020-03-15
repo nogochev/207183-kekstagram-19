@@ -1,37 +1,34 @@
 'use strict';
 
 (function () {
-  var body = document.querySelector('body');
-  var imgUpload = document.querySelector('.img-upload__input');
+  var imgUploadFile = document.querySelector('#upload-file');
   var imgUploadForm = document.querySelector('.img-upload__form');
-  var imgEdit = document.querySelector('.img-upload__overlay');
-  var imgEditCancelButton = imgEdit.querySelector('#upload-cancel');
-  var imgHashtag = imgEdit.querySelector('.text__hashtags');
-  var imgCommentPreview = imgEdit.querySelector('.text__description');
+  var imgUploadPopup = document.querySelector('.img-upload__overlay');
+  var imgUploadCancelButton = imgUploadPopup.querySelector('#upload-cancel');
+  var imgHashtag = imgUploadPopup.querySelector('.text__hashtags');
+  var imgCommentPreview = imgUploadPopup.querySelector('.text__description');
 
-  var EFFECT_ORIGINAL = 'none';
-
-  var onImgUploadChange = function () {
+  var onImgUploadFileChange = function () {
     openUploadPreview();
   };
 
-  var onPreviewButtonCloseClick = function () {
+  var onImgUploadCancelButtonClick = function () {
     closeUploadPreview();
   };
 
   var openUploadPreview = function () {
-    imgEdit.classList.remove('hidden');
-    body.classList.add('modal-open');
-    window.effectBar.applyEffect(EFFECT_ORIGINAL);
+    imgUploadPopup.classList.remove('hidden');
+    document.body.classList.add('modal-open');
 
     document.addEventListener('keydown', onImgEditEscPress);
+    window.effectBar.applyFilter();
   };
 
   var closeUploadPreview = function () {
-    imgEdit.classList.add('hidden');
-    body.classList.remove('modal-open');
+    imgUploadPopup.classList.add('hidden');
+    document.body.classList.remove('modal-open');
     imgUploadForm.reset();
-    window.effectBar.resetImageEffect();
+    window.effectBar.resetFilter();
 
     document.removeEventListener('keydown', onImgEditEscPress);
   };
@@ -46,6 +43,6 @@
     }
   };
 
-  imgEditCancelButton.addEventListener('click', onPreviewButtonCloseClick);
-  imgUpload.addEventListener('change', onImgUploadChange);
+  imgUploadCancelButton.addEventListener('click', onImgUploadCancelButtonClick);
+  imgUploadFile.addEventListener('change', onImgUploadFileChange);
 })();
