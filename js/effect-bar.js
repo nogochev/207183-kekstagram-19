@@ -41,6 +41,7 @@
 
   var resetImageEffect = function () {
     applyEffect(EffectClass.NONE);
+    applyEffect(EFFECT_ORIGINAL);
   };
 
   var hideEffectLevel = function () {
@@ -53,8 +54,10 @@
 
   effectFields.addEventListener('change', onEffectFieldsChange);
 
+  var effectOriginal = applyEffect(EFFECT_ORIGINAL);
+
   window.effectBar = {
     resetFilter: resetImageEffect,
-    applyFilter: applyEffect(EFFECT_ORIGINAL),
+    applyFilter: effectOriginal,
   };
 })();
