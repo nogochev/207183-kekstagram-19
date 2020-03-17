@@ -54,7 +54,9 @@
 
   effectFields.addEventListener('change', onEffectFieldsChange);
 
-  var effectOriginal = applyEffect(EFFECT_ORIGINAL);
+  var effectOriginal = function () {
+    applyEffect(EFFECT_ORIGINAL);
+  };
 
   window.effectBar = {
     resetFilter: resetImageEffect,

@@ -27,6 +27,7 @@
   var closeUploadPreview = function () {
     imgUploadPopup.classList.add('hidden');
     document.body.classList.remove('modal-open');
+    window.scale.reset();
     imgUploadForm.reset();
     window.effectBar.resetFilter();
 
