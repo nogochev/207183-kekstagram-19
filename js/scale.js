@@ -48,4 +48,12 @@
 
   scaleUpButton.addEventListener('click', onScaleUpButtonClick);
   scaleDownButton.addEventListener('click', onScaleDownButtonClick);
+
+  var scalePreviewDefault = function () {
+    setScale(ScaleValue.MAX);
+  };
+
+  window.scale = {
+    reset: scalePreviewDefault,
+  };
 })();

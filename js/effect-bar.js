@@ -1,17 +1,18 @@
 'use strict';
 
 (function () {
-  var imgEdit = document.querySelector('.img-upload__overlay');
-  var previewImage = imgEdit.querySelector('.img-upload__preview img');
-  var effectFields = imgEdit.querySelector('.img-upload__effects');
-  var effectLevel = imgEdit.querySelector('.effect-level');
-
   var EFFECT_ORIGINAL = 'none';
 
   var EffectClass = {
     NONE: '',
     NAME: 'effects__preview--',
   };
+
+  var imgEdit = document.querySelector('.img-upload__overlay');
+  var previewImage = imgEdit.querySelector('.img-upload__preview img');
+  var effectFields = imgEdit.querySelector('.img-upload__effects');
+  var effectLevel = imgEdit.querySelector('.effect-level');
+
 
   var currentEffect = EFFECT_ORIGINAL;
 
@@ -40,6 +41,7 @@
 
   var resetImageEffect = function () {
     applyEffect(EffectClass.NONE);
+    applyEffect(EFFECT_ORIGINAL);
   };
 
   var hideEffectLevel = function () {
@@ -52,8 +54,12 @@
 
   effectFields.addEventListener('change', onEffectFieldsChange);
 
+  var effectOriginal = function () {
+    applyEffect(EFFECT_ORIGINAL);
+  };
+
   window.effectBar = {
-    resetImageEffect: resetImageEffect,
-    applyEffect: applyEffect,
+    resetFilter: resetImageEffect,
+    applyFilter: effectOriginal,
   };
 })();
