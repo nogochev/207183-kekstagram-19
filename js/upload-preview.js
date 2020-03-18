@@ -20,16 +20,16 @@
     imgUploadPopup.classList.remove('hidden');
     document.body.classList.add('modal-open');
 
+    window.scale.reset();
+    imgUploadForm.reset();
     document.addEventListener('keydown', onImgEditEscPress);
-    window.effectBar.applyFilter();
+    window.effectBar.resetFilter();
+    window.slider.effectLevelPinReset();
   };
 
   var closeUploadPreview = function () {
     imgUploadPopup.classList.add('hidden');
     document.body.classList.remove('modal-open');
-    window.scale.reset();
-    imgUploadForm.reset();
-    window.effectBar.resetFilter();
 
     document.removeEventListener('keydown', onImgEditEscPress);
   };

@@ -33,6 +33,7 @@
     } else {
       showEffectLevel();
     }
+    window.slider.effectLevelPinReset();
   };
 
   var onEffectFieldsChange = function (evt) {
@@ -40,7 +41,6 @@
   };
 
   var resetImageEffect = function () {
-    applyEffect(EffectClass.NONE);
     applyEffect(EFFECT_ORIGINAL);
   };
 
@@ -54,12 +54,7 @@
 
   effectFields.addEventListener('change', onEffectFieldsChange);
 
-  var effectOriginal = function () {
-    applyEffect(EFFECT_ORIGINAL);
-  };
-
   window.effectBar = {
     resetFilter: resetImageEffect,
-    applyFilter: effectOriginal,
   };
 })();
