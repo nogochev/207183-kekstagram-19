@@ -13,6 +13,7 @@
     userPictures.appendChild(fragment);
   };
 
-  var photos = window.data.generatePhotos();
-  addPictures(photos);
+  window.gallery = {
+    addPictures: addPictures,
+  };
 })();
