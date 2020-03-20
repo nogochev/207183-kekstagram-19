@@ -6,15 +6,14 @@
   var StatusCode = {
     OK: 200
   };
-  var arrayPictures = [];
 
-  var loadData = function (successHandler) {
+  var loadData = function (success) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
       if (xhr.status === StatusCode.OK) {
-        successHandler(xhr.response);
+        success(xhr.response);
       } else {
         throw new Error('Произошла ошибка: ' + xhr.status + ' ' + xhr.statusText);
       }
@@ -36,6 +35,5 @@
 
   window.load = {
     loadData: loadData,
-    arrayPictures: arrayPictures
   };
 })();

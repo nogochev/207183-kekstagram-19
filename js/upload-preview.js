@@ -24,7 +24,7 @@
     imgUploadForm.reset();
     document.addEventListener('keydown', onImgEditEscPress);
     window.effectBar.resetFilter();
-    window.slider.effectLevelPinReset();
+    window.slider.resetEffectLevelPin();
   };
 
   var closeUploadPreview = function () {

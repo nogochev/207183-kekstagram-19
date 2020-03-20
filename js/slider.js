@@ -8,7 +8,7 @@
   var effectLevelPin = document.querySelector('.effect-level__pin');
   var effectLevelDepth = document.querySelector('.effect-level__depth');
 
-  var effectLevelPinDefault = function () {
+  var resetEffectLevelPin = function () {
     effectLevelPin.style.left = EffectLineRect.RIGHT + 'px';
     effectLevelDepth.style.width = EffectLineRect.RIGHT + 'px';
   };
@@ -44,6 +44,6 @@
   });
 
   window.slider = {
-    effectLevelPinReset: effectLevelPinDefault,
+    effectLevelPinReset: resetEffectLevelPin,
   };
 })();

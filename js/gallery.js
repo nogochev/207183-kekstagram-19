@@ -13,7 +13,11 @@
     userPictures.appendChild(fragment);
   };
 
-  window.gallery = {
-    addPictures: addPictures,
+  var succsessUpload = function (data) {
+    window.load.arrayPictures = data;
+    addPictures(window.load.arrayPictures);
   };
+
+  window.load.loadData(succsessUpload);
+
 })();
